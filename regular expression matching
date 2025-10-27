@@ -1,0 +1,38 @@
+class Solution(object):
+    def isMatch(self, s, p):
+        """
+        :type s: str
+        :type p: str
+        :rtype: bool
+        """
+        memo = {}  # Dictionary to store results of subproblems (memoization)
+
+        def dp(i, j):
+            # If the result for (i, j) is already computed, return it
+            if (i, j) in memo:
+                return memo[(i, j)]
+
+            # Base case: If pattern is exhausted
+            if j == len(p):
+                # If string is also exhausted, it's a match
+                res = i == len(s)
+            else:
+                # Check if current characters match (or if pattern has '.')
+                match = i < len(s) and (p[j] == s[i] or p[j] == '.')
+
+                # If the next character in pattern is '*'
+                if j + 1 < len(p) and p[j + 1] == '*':
+                    # Two possibilities:
+                    # 1. '*' matches zero occurrences of the preceding element (skip p[j] and p[j+1])
+                    # 2. '*' matches one or more occurrences (match current s[i] and stay at p[j])
+                    res = dp(i, j + 2) or (match and dp(i + 1, j))
+                else:
+                    # If no '*' or '*' is not present, simply match current characters
+                    res = match and dp(i + 1, j + 1)
+
+            # Store the result for (i, j) and return it
+            memo[(i, j)] = res
+            return res
+
+        # Start the dynamic programming from the beginning of both strings
+        return dp(0, 0)
